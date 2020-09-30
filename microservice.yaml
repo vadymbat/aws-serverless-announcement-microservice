@@ -50,7 +50,7 @@ Resources:
       FunctionName:
         Fn::Sub: announcement-app-${StageName}-list-announcements
       CodeUri: api/
-      Handler: api.list_announcements
+      Handler: handler.list_announcements
       Policies:
         DynamoDBReadPolicy:
           TableName:
