@@ -25,6 +25,7 @@ Resources:
     Properties:
       FunctionName:
         Fn::Sub: announcement-app-${StageName}-create-announcement
+      Runtime: python3.7
       CodeUri: api/
       Handler: handler.create_announcement
       Policies:
@@ -33,7 +34,7 @@ Resources:
             Ref: AnnouncementsTable
       Environment:
         Variables:
-          TABLE_NAME:
+          ANNOUNCEMENT_TABLE_NAME:
             Ref: AnnouncementsTable
       Events:
         Post:
@@ -41,7 +42,7 @@ Resources:
           Properties:
             RestApiId:
               Ref: RestApi
-            Path: /
+            Path: /announcement
             Method: POST
 
   ListAnnouncementsFunction:
@@ -49,23 +50,24 @@ Resources:
     Properties:
       FunctionName:
         Fn::Sub: announcement-app-${StageName}-list-announcements
+      Runtime: python3.7
       CodeUri: api/
       Handler: handler.list_announcements
       Policies:
         DynamoDBReadPolicy:
           TableName:
-            Ref: TasksTable
+            Ref: AnnouncementsTable
       Environment:
         Variables:
-          TABLE_NAME:
-            Ref: TasksTable
+          ANNOUNCEMENT_TABLE_NAME:
+            Ref: AnnouncementsTable
       Events:
         Get:
           Type: Api
           Properties:
             RestApiId:
               Ref: RestApi
-            Path: /
+            Path: /announcement
             Method: GET
 
   AnnouncementsTable:
