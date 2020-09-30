@@ -41,7 +41,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Announcement'
+              $ref: '#/components/schemas/NewAnnouncement'
       responses:
         '201':
           description: announcement response
@@ -71,7 +71,23 @@ components:
     Announcement:
       type: object
       required:
-        - title  
+        - title
+        - date
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        date:
+          type: string
+          format: date-time
+    NewAnnouncement:
+      type: object
+      required:
+        - title
+        - date
       properties:
         title:
           type: string
