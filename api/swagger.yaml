@@ -5,26 +5,8 @@ info:
 paths:
   /announcement:
     get:
-      description: |
-        Return all announcements
-      operationId: findAnnouncements
-      parameters:
-        - name: title
-          in: query
-          description: title to filter by
-          required: false
-          style: form
-          schema:
-            type: array
-            items:
-              type: string
-        - name: limit
-          in: query
-          description: maximum number of results to return
-          required: false
-          schema:
-            type: integer
-            format: int32
+      summary: List tasks
+      description: Returns list of tasks
       responses:
         '200':
           description: announcements response
