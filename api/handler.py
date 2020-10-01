@@ -2,7 +2,7 @@
 import os, json
 import logging
 import boto3
-import datetime
+import uuid
 from botocore.exceptions import ClientError
 
 import helper
@@ -15,7 +15,7 @@ def create_announcement(event, context):
     body = json.loads(event['body'])
     try:
         item = {
-            'id': f"{datetime.datetime.now().timestamp()}",
+            'id': f"{uuid.uuid4().hex}",
             'title': body['title'],
             'description' : body['description'],
             'date' : body['date']
