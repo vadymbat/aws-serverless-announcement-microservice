@@ -17,6 +17,7 @@ def get_dynamodb_resource():
     session = boto3.Session(region_name=REGION)
     return session.resource('dynamodb')
 
+
 def dynamodb_put_item(item):
     dynamodb_resource = get_dynamodb_resource()
     table = dynamodb_resource.Table(ANNOUNCEMENT_TABLE_NAME)
