@@ -127,3 +127,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Processed CloudFormation templates
+processed_template.yaml
+
+# IDE
+.vscode/
