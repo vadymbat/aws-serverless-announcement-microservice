@@ -20,6 +20,7 @@ Resources:
             Name: AWS::Include
             Parameters:
               Location: api/swagger.yaml
+
   CreateAnnouncementFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -84,3 +85,8 @@ Resources:
       Tags:
         stage:
           Ref: StageName
+
+Outputs:
+  ApiUrl:
+    Description: Url
+    Value: !Sub "https://${RestApi}.execute-api.eu-central-1.amazonaws.com/${StageName}/announcement"
