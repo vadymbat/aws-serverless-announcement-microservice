@@ -94,7 +94,7 @@ components:
         description:
           type: string
         date:
-          description: The announcement date and time in UTC time e.g. 2011-11-04 23:12
+          description: The announcement date and time in UTC format e.g. 2011-11-04 23:12
           type: string
           format: date-time
     Error:
