@@ -7,6 +7,9 @@ Parameters:
     Type: String
     Default: dev
     Description: The Lambda Function Stage
+  LambdaLogLevel:
+    Type: String
+    Default: DEBUG
 Resources:
   RestApi:
     Type: AWS::Serverless::Api
@@ -19,7 +22,7 @@ Resources:
           Fn::Transform:
             Name: AWS::Include
             Parameters:
-              Location: api/swagger.yaml
+              Location: swagger.yaml
 
   CreateAnnouncementFunction:
     Type: AWS::Serverless::Function
@@ -37,6 +40,8 @@ Resources:
         Variables:
           ANNOUNCEMENT_TABLE_NAME:
             Ref: AnnouncementsTable
+          LOG_LEVEL:
+            Ref: LambdaLogLevel
       Events:
         Post:
           Type: Api
@@ -62,6 +67,8 @@ Resources:
         Variables:
           ANNOUNCEMENT_TABLE_NAME:
             Ref: AnnouncementsTable
+          LOG_LEVEL:
+            Ref: LambdaLogLevel
       Events:
         Get:
           Type: Api

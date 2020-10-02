@@ -11,7 +11,7 @@ def create_announcement(event, context):
     except Exception as e:
         logging.error(e)
         status_code = 500
-        raise e
+        helper.generate_response(status_code, { 'message': "Recieved malformed data!"})
     return helper.generate_response(status_code, item)
 
 
@@ -21,5 +21,6 @@ def list_announcements(event, context):
         status_code = 200
     except Exception as e:
         status_code = 500
-        raise e
+        logging.error(e)
+        helper.generate_response(status_code, { 'message': "Cannot list announcements."})
     return helper.generate_response(status_code, items)
