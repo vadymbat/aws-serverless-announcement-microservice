@@ -5,8 +5,8 @@ import uuid
 import logging
 from datetime import datetime
 
-
 from botocore.exceptions import ClientError
+
 
 REGION = os.environ['AWS_REGION']
 LOG_LEVEL = os.environ['LOG_LEVEL']
@@ -16,6 +16,7 @@ COMMON_HEADERS = {
 }
 logging.basicConfig()
 logging.getLogger().setLevel(LOG_LEVEL)
+
 
 def get_dynamodb_client():
     session = boto3.Session(region_name=REGION)
@@ -40,20 +41,21 @@ def dynamodb_put_item(item):
 
 
 def dynamodb_list_items():
-    response = None
+    data = None
     dynamodb_resource = get_dynamodb_resource()
     table = dynamodb_resource.Table(ANNOUNCEMENT_TABLE_NAME)
     try:
         response = table.scan()
+        data = response['Items']
     except ClientError as e:
-        logging.error(e.response['Error']['Message'])
-    data = response['Items']
+        logging.error(f"Failed to scan {ANNOUNCEMENT_TABLE_NAME}")
+        raise e
     while 'LastEvaluatedKey' in response:
         try:
             response = table.scan(ExclusiveStartKey=response['LastEvaluatedKey'])
             data.extend(response['Items'])
         except ClientError as e:
-            logging.error(e.response['Error']['Message'])
+            logging.error(e)
             raise e
     return data
 
@@ -61,12 +63,8 @@ def dynamodb_list_items():
 def generate_announcement(request_body):
     body = json.loads(request_body)
     logging.debug(f"The announcement create request body is {request_body}.")
-    try:
-        logging.info(f"The date is {body['date']}")
-        announcement_date = datetime.fromisoformat(body['date'])
-    except ValueError as e:
-        logging.error("Can not convert date.")
-        raise e
+    logging.info(f"The date is {body['date']}")
+    announcement_date = datetime.fromisoformat(body['date'])
     item = {
         'id': f"{uuid.uuid4().hex}",
         'title': body['title'],
@@ -77,7 +75,7 @@ def generate_announcement(request_body):
 
 
 def generate_response(status_code, body, custom_headers={}, is_base64=False):
-    headers = { **COMMON_HEADERS, **custom_headers }
+    headers = {**COMMON_HEADERS, **custom_headers}
     response = {
         'statusCode': status_code,
         'body': json.dumps(body),
@@ -85,3 +83,14 @@ def generate_response(status_code, body, custom_headers={}, is_base64=False):
         'isBase64Encoded': is_base64
     }
     return response
+
+
+def generate_error(status_code, message):
+    error_body = {
+        'message': message,
+        'code': status_code
+    }
+    return generate_response(
+        status_code,
+        error_body
+    )
