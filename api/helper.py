@@ -1,11 +1,18 @@
 import os
+import json
 import boto3
+import uuid
 import logging
+from datetime import datetime
+
 
 from botocore.exceptions import ClientError
 
 REGION = os.environ['AWS_REGION']
 ANNOUNCEMENT_TABLE_NAME = os.environ['ANNOUNCEMENT_TABLE_NAME']
+COMMON_HEADERS = {
+    'content': 'application/json'
+}
 
 
 def get_dynamodb_client():
@@ -47,3 +54,30 @@ def dynamodb_list_items():
             logging.error(e.response['Error']['Message'])
             raise e
     return data
+
+
+def generate_announcement(request_body):
+    body = json.loads(request_body)
+    try:
+        announcement_date = datetime.fromisoformat(request_body['date'])
+    except ValueError as e:
+        logging.error(e)
+    item = {
+        'id': f"{uuid.uuid4().hex}",
+        'title': body['title'],
+        'description': body['description'],
+        'date': datetime.strptime(announcement_date)
+    }
+    return item
+
+
+def generate_response(status_code, body, custom_headers={}, is_base64=False):
+    headers = {}
+    headers += COMMON_HEADERS + custom_headers
+    response = {
+        'statusCode': status_code,
+        'body': json.dumps(body),
+        'headers': COMMON_HEADERS,
+        'isBase64Encoded': is_base64
+    }
+    return response

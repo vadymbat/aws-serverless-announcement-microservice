@@ -1,41 +1,18 @@
 #!/usr/bin/env python
-import os
-import json
 import logging
-import boto3
-import uuid
-from botocore.exceptions import ClientError
-
 import helper
-
-COMMON_HEADERS = {
-    'content': 'application/json'
-}
 
 
 def create_announcement(event, context):
-    body = json.loads(event['body'])
+    item = helper.generate_announcement(event['body'])
     try:
-        item = {
-            'id': f"{uuid.uuid4().hex}",
-            'title': body['title'],
-            'description': body['description'],
-            'date': body['date']
-        }
-
         helper.dynamodb_put_item(item)
         status_code = 201
     except Exception as e:
         logging.error(e)
         status_code = 500
         raise e
-    response = {
-        'statusCode': status_code,
-        'body': json.dumps(item),
-        'headers': COMMON_HEADERS,
-        'isBase64Encoded': False
-    }
-    return response
+    return helper.generate_response(status_code, item)
 
 
 def list_announcements(event, context):
@@ -45,10 +22,4 @@ def list_announcements(event, context):
     except Exception as e:
         status_code = 500
         raise e
-    response = {
-        'statusCode': status_code,
-        'body': json.dumps(items),
-        'headers': COMMON_HEADERS,
-        'isBase64Encoded': False
-    }
-    return response
+    return helper.generate_response(status_code, items)
