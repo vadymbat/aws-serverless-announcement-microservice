@@ -1,0 +1,150 @@
+{
+	"info": {
+		"_postman_id": "aa467ff5-7075-4286-b799-927da0e497a7",
+		"name": "aws-serverless-announcement-microservice",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "create_announcement",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "d3c79a62-7b4f-4b6f-94dc-c64657c08933",
+						"exec": [
+							"pm.environment.set(\"announcement_title\", \"Test title\");\r",
+							"pm.environment.set(\"announcement_date\", \"2020-11-12 12:30\");\r",
+							"pm.environment.set(\"announcement_description\", \"Test description\");"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "5e8bad4b-8432-455d-bf98-41f9bda8609a",
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"//parse the response json and test three properties\r",
+							"    pm.response.to.have.status(201);   \r",
+							"});\r",
+							"pm.test(\"The response contains created announcement\", () => {\r",
+							"    const responseJson = pm.response.json();\r",
+							"    pm.expect(responseJson.title).to.eql(pm.variables.get(\"announcement_title\"));\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"title\": \"{{announcement_title}}\",\r\n    \"date\": \"{{announcement_date}}\",\r\n    \"description\": \"{{announcement_description}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{api_gateway_id}}.execute-api.{{aws_region}}.amazonaws.com/dev/announcement",
+					"protocol": "https",
+					"host": [
+						"{{api_gateway_id}}",
+						"execute-api",
+						"{{aws_region}}",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"dev",
+						"announcement"
+					]
+				},
+				"description": "Create an announcement"
+			},
+			"response": []
+		},
+		{
+			"name": "list_announcement",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "5bae5da2-d47c-4ffd-abb1-1ce5a2c39d32",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);   \r",
+							"});\r",
+							"pm.test(\"The response contains list of announcements\", () => {\r",
+							"    const responseJson = pm.response.json();\r",
+							"    pm.expect(responseJson).to.be.an('array').that.is.not.empty;\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://{{api_gateway_id}}.execute-api.{{aws_region}}.amazonaws.com/dev/announcement",
+					"protocol": "https",
+					"host": [
+						"{{api_gateway_id}}",
+						"execute-api",
+						"{{aws_region}}",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"dev",
+						"announcement"
+					]
+				},
+				"description": "Create an announcement"
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "e8042a23-c7e1-4546-941a-0915a8fed272",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "be509b8a-e78e-4d7e-987f-1e9a4efde827",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "95d6e97e-94ef-4b08-9dcc-17c84932a014",
+			"key": "aws_region",
+			"value": "eu-central-1"
+		},
+		{
+			"id": "1661205c-ca81-454e-9561-0572671457f3",
+			"key": "api_gateway_id",
+			"value": ""
+		}
+	],
+	"protocolProfileBehavior": {}
+}
