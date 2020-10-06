@@ -1,6 +1,8 @@
 # Announcement microservice application
+![Application diagram](img/announcement_app_architecture.svg)
+
 The application consists of:
-* 1 AWS Api Gateway
+* 1 AWS REST Api Gateway
 * 2 Lambdas
 * 1 DynamoDB table
 
