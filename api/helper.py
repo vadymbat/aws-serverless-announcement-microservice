@@ -68,13 +68,15 @@ def generate_announcement(request_body):
     logging.debug(f"The announcement create request body is {request_body}.")
     logging.info(f"The date is {body['date']}")
     announcement_date = datetime.fromisoformat(body['date'])
-    item = {
+    announcement_description = body.get('description')
+    announcement = {
         'id': f"{uuid.uuid4().hex}",
         'title': body['title'],
-        'description': body.get('description'),
         'date': datetime.isoformat(announcement_date)
     }
-    return item
+    if announcement_description:
+        announcement['description'] = announcement_description
+    return announcement
 
 
 def generate_response(status_code, body, custom_headers={}, is_base64=False):
