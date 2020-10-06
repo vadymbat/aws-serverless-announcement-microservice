@@ -68,7 +68,7 @@ def generate_announcement(request_body):
     item = {
         'id': f"{uuid.uuid4().hex}",
         'title': body['title'],
-        'description': body['description'],
+        'description': body.get('description'),
         'date': datetime.isoformat(announcement_date)
     }
     return item
