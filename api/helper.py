@@ -11,6 +11,7 @@ from botocore.exceptions import ClientError
 REGION = os.environ['AWS_REGION']
 LOG_LEVEL = os.environ['LOG_LEVEL']
 ANNOUNCEMENT_TABLE_NAME = os.environ['ANNOUNCEMENT_TABLE_NAME']
+UNKNOWN_ERROR_MESSAGE = "Unknown error happened, please contact the support team."
 COMMON_HEADERS = {
     'content': 'application/json'
 }
