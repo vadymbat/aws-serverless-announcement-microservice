@@ -53,7 +53,9 @@ def dynamodb_list_items():
         raise e
     while 'LastEvaluatedKey' in response:
         try:
-            response = table.scan(ExclusiveStartKey=response['LastEvaluatedKey'])
+            response = table.scan(
+                ExclusiveStartKey=response
+                ['LastEvaluatedKey'])
             data.extend(response['Items'])
         except ClientError as e:
             logging.error(e)
