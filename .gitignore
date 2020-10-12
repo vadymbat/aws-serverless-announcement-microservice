@@ -133,3 +133,4 @@ processed_template.yaml
 
 # IDE
 .vscode/
+.devcontainer/
