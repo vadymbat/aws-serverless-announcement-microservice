@@ -36,6 +36,7 @@ phases:
       # - command
   build:
     commands:
+      - pwd
       - ./deploy.sh
   #post_build:
     #commands:
