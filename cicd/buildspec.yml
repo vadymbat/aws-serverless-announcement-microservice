@@ -1,6 +1,7 @@
 version: 0.2
 
 env:
+  shell: bash
   variables:
     CONFIG_S3_BUCKET: "aws-serverless-announcement-microservice"
     CF_STACK_NAME: "announcment-app"
@@ -35,7 +36,7 @@ phases:
       # - command
   build:
     commands:
-      - bash ../deploy.sh
+      - ./deploy.sh
   #post_build:
     #commands:
       # - command
