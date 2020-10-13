@@ -235,13 +235,13 @@ Resources:
                 Provider: CloudFormation
                 Version: "1"
               InputArtifacts:
-                - Name: SourceCode
+                - Name: CfProcessedTemplate
               Configuration:
                 ActionMode: CREATE_UPDATE
                 Capabilities: CAPABILITY_IAM
                 RoleArn: !GetAtt CloudformationRole.Arn
                 StackName: !Ref ApplicationName
-                TemplatePath: !Sub "CfProcessedTemplate::processed_template.yaml"
+                TemplatePath: CfProcessedTemplate::processed_template.yaml
               RunOrder: 1
 
   # 'GithubWebhook' satisfies two requirements:
