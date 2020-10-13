@@ -1,9 +1,8 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: |
-  An example RESTful service cicd
+  An example of serverless application cicd
 Parameters:
-  # *** This value must always be passed in when creating / updating stack
-  # "NoEcho" is set to true, for security, so token won't be visible when examining the resulting stack
+
   GitHubOAuthToken:
     Type: String
     NoEcho: true
@@ -11,11 +10,6 @@ Parameters:
     MaxLength: 40
     AllowedPattern: "[a-z0-9]*"
 
-  # *** The remaining parameters should either be:
-  # - overridden via changing "Default" here (PREFERABLE, since then they're in source control)
-  # - or you can pass them in when creating / updating the stack
-
-  # *** The owner of the Github repo for this application.
   GitHubOwner:
     Type: String
     Default: vadymbat
@@ -31,11 +25,11 @@ Parameters:
     Default: cicd
     AllowedPattern: "[A-Za-z0-9-]+"
 
-  # *** The stack name for the actual application we're deploying
   ApplicationName:
     Type: String
     Default: announcement-app
     AllowedPattern: "[A-Za-z0-9-]+"
+
   StageName:
     Type: String
     Default: dev
@@ -270,6 +264,8 @@ Resources:
                 RoleArn: !GetAtt CloudformationRole.Arn
                 StackName: !Ref ApplicationName
                 TemplatePath: CfProcessedTemplate::processed_template.yaml
+              OutputArtifacts:
+                - Name: StackAOutput
               RunOrder: 1
 
   GithubWebhook:
