@@ -1,0 +1,32 @@
+version: 0.2
+
+env:
+  shell: bash
+  variables:
+    CONFIG_S3_BUCKET_PATH: "cf_packages"
+phases:
+
+  install:
+    runtime-versions:
+      nodejs: 10
+    commands: #https://learning.getpostman.com/docs/postman/collection-runs/command-line-integration-with-newman/
+      - npm install -g newman
+      - yum install -y jq
+
+  pre_build:
+    commands:
+      - aws s3 cp "s3://${S3_BUCKET}/postman-env-files/PetStoreAPIEnvironment.postman_environment.json" ./02postman/
+      - aws s3 cp "s3://${S3_BUCKET}/postman-env-files/PetStoreAPI.postman_collection.json" ./02postman/
+      - cd ./02postman
+      - ./update-postman-env-file.sh
+  build:
+    commands:
+      - |
+        aws cloudformation package \
+          --template-file announcement_app.yaml \
+          --s3-bucket "${CONFIG_S3_BUCKET}" \
+          --s3-prefix "${CONFIG_S3_BUCKET_PATH}" \
+          --output-template-file processed_template.yaml
+artifacts:
+  files:
+    - processed_template.yaml
