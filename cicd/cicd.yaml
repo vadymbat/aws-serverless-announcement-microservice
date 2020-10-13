@@ -238,7 +238,7 @@ Resources:
                 - Name: CfProcessedTemplate
               Configuration:
                 ActionMode: CREATE_UPDATE
-                Capabilities: CAPABILITY_IAM
+                Capabilities: CAPABILITY_IAM CAPABILITY_AUTO_EXPAND
                 RoleArn: !GetAtt CloudformationRole.Arn
                 StackName: !Ref ApplicationName
                 TemplatePath: CfProcessedTemplate::processed_template.yaml
