@@ -3,7 +3,8 @@ version: 0.2
 env:
   shell: bash
   variables:
-    CONFIG_S3_BUCKET: "aws-serverless-announcement-microservice"
+    CONFIG_S3_BUCKET: "aws-serverless-announcement-microservice-templates"
+    CONFIG_S3_BUCKET_PATH: "cf_packages"
     CF_STACK_NAME: "announcment-app"
   #parameter-store:
      # key: "value"
@@ -36,8 +37,12 @@ phases:
       # - command
   build:
     commands:
-      - pwd
-      - bash ./deploy.sh
+      - |
+        aws cloudformation package \
+          --template-file announcement_app.yaml \
+          --s3-bucket "${CONFIG_S3_BUCKET}" \
+          --s3-prefix "${CONFIG_S3_BUCKET_PATH}"
+          --output-template-file processed_template.yaml
   #post_build:
     #commands:
       # - command
@@ -51,6 +56,7 @@ phases:
     #discard-paths: yes
     #file-format: JunitXml | CucumberJson
 artifacts:
+  type: zip
   files:
     - processed_template.yaml
   #name: $(date +%Y-%m-%d)
