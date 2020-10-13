@@ -206,6 +206,33 @@ Resources:
           Value: !Ref StageName
       TimeoutInMinutes: 5
 
+  CodeBuildTestAnnouncementApp:
+    Type: "AWS::CodeBuild::Project"
+    Properties:
+      Name: !Sub ${StageName}-${ApplicationName}-test
+      Description: Test announcement app
+      ServiceRole: !GetAtt CodeBuildServiceRole.Arn
+      Source:
+        Type: CODEPIPELINE
+        BuildSpec: cicd/test_buildspec.yml
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/amazonlinux2-x86_64-standard:2.0
+        EnvironmentVariables:
+          - Name: API_GATEWAY_URL
+            Type: PLAINTEXT
+            Value: Fn::GetParam ["DeployOutput", "DeployOutput.json", "ApiUrl"]
+      LogsConfig:
+        CloudWatchLogs:
+          Status: ENABLED
+      Artifacts:
+        Type: CODEPIPELINE
+      Tags:
+        - Key: StageName
+          Value: !Ref StageName
+      TimeoutInMinutes: 5
+
   InfraDeploymentPipelineCodePipeline:
     Type: AWS::CodePipeline::Pipeline
     Properties:
@@ -233,7 +260,7 @@ Resources:
                 PollForSourceChanges: false
                 OAuthToken: !Ref GitHubOAuthToken
               RunOrder: 1
-        - Name: Prepare-CloudFormation-Templates
+        - Name: Build-cf-templates
           Actions:
             - Name: Package-CFTemplates
               ActionTypeId:
@@ -246,7 +273,7 @@ Resources:
               InputArtifacts:
                 - Name: SourceCode
               OutputArtifacts:
-                - Name: CfProcessedTemplate
+                - Name: BuildArtifact
               RunOrder: 1
         - Name: Deploy
           Actions:
@@ -257,15 +284,32 @@ Resources:
                 Provider: CloudFormation
                 Version: "1"
               InputArtifacts:
-                - Name: CfProcessedTemplate
+                - Name: BuildArtifact
               Configuration:
                 ActionMode: CREATE_UPDATE
+                OutputFileName: DeployOutput.json
                 Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
                 RoleArn: !GetAtt CloudformationRole.Arn
                 StackName: !Ref ApplicationName
-                TemplatePath: CfProcessedTemplate::processed_template.yaml
+                TemplatePath: BuildArtifact::processed_template.yaml
               OutputArtifacts:
-                - Name: StackAOutput
+                - Name: DeployOutput
+              RunOrder: 1
+        - Name: Test
+          Actions:
+            - Name: RunIntegrationTests
+              ActionTypeId:
+                Owner: AWS
+                Category: Test
+                Version: 1
+                Provider: CodeBuild
+              Configuration:
+                ProjectName: !Ref CodeBuildTestAnnouncementApp
+              InputArtifacts:
+                - Name: SourceCode
+                - Name: DeployOutput
+              OutputArtifacts:
+                - Name: TestResults
               RunOrder: 1
 
   GithubWebhook:
