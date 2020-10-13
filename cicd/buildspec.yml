@@ -3,9 +3,7 @@ version: 0.2
 env:
   shell: bash
   variables:
-    CONFIG_S3_BUCKET: "aws-serverless-announcement-microservice-templates"
     CONFIG_S3_BUCKET_PATH: "cf_packages"
-    CF_STACK_NAME: "announcment-app"
   #parameter-store:
      # key: "value"
      # key: "value"
