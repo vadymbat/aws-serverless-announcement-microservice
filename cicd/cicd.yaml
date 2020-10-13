@@ -82,7 +82,10 @@ Resources:
           - Effect: "Allow"
             Action:
               - "s3:*"
-            Resource: !Sub "arn:aws:s3:::${CodePipelineArtifactsS3Bucket}"
+            Resource:
+              - !Sub "arn:aws:s3:::${CodePipelineArtifactsS3Bucket}/*"
+              - !Sub "arn:aws:s3:::${CodePipelineArtifactsS3Bucket}"
+            
   CodeBuildLogsPolicy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
@@ -96,6 +99,39 @@ Resources:
               - "logs:CreateLogStream"
               - "logs:PutLogEvents"
             Resource: "*"
+  CodePipelineCodeBuildPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Sub "${StageName}-${ApplicationName}-CodePipelineCodeBuild"
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Action:
+              - "codebuild:StartBuild"
+              - "codebuild:BatchGetBuilds"
+            Resource: "*"
+  CodePipelineCloudformationPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Sub "${StageName}-${ApplicationName}-CodePipelineCloudformation"
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Action:
+              - "cloudformation:DescribeStacks"
+              - "cloudformation:DescribeChangeSet"
+              - "cloudformation:CreateStack"
+              - "cloudformation:DeleteStack"
+              - "cloudformation:UpdateStack"
+              - "cloudformation:CreateChangeSet"
+              - "cloudformation:DeleteChangeSet"
+              - "cloudformation:ExecuteChangeSet"
+              - "cloudformation:SetStackPolicy"
+              - "cloudformation:ValidateTemplate"
+              - "iam:PassRole"
+            Resource: "*"
   CodePipelineServiceRole:
     Type: AWS::IAM::Role
     Properties:
@@ -103,6 +139,8 @@ Resources:
       ManagedPolicyArns:
         - !Ref CodeBuildLogsPolicy
         - !Ref CodePipelineArtifactsS3BucketPolicy
+        - !Ref CodePipelineCodeBuildPolicy
+        - !Ref CodePipelineCloudformationPolicy
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
