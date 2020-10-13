@@ -144,32 +144,5 @@
             }
         }
     ],
-    "variable": [
-        {
-            "id": "c9439f32-c6e7-4c88-85c1-92b10f77d095",
-            "key": "aws_region",
-            "value": "eu-central-1"
-        },
-        {
-            "id": "3e07350b-b31a-4cab-bfc9-79d1ff76b2de",
-            "key": "api_gateway_id",
-            "value": ""
-        },
-        {
-            "id": "99ef2ae1-17e0-46e6-a4f0-9a759950ed98",
-            "key": "announcement_title",
-            "value": "Test title"
-        },
-        {
-            "id": "0d9d81f5-f74c-482f-a26b-b999e702cdba",
-            "key": "announcement_date",
-            "value": "2020-11-12 12:30"
-        },
-        {
-            "id": "ed45fd8c-6dc5-4ad7-b9fb-a9c43fc60141",
-            "key": "announcement_description",
-            "value": "Test description"
-        }
-    ],
     "protocolProfileBehavior": {}
 }
