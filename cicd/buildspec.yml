@@ -39,7 +39,7 @@ phases:
         aws cloudformation package \
           --template-file announcement_app.yaml \
           --s3-bucket "${CONFIG_S3_BUCKET}" \
-          --s3-prefix "${CONFIG_S3_BUCKET_PATH}"
+          --s3-prefix "${CONFIG_S3_BUCKET_PATH}" \
           --output-template-file processed_template.yaml
   #post_build:
     #commands:
@@ -54,7 +54,6 @@ phases:
     #discard-paths: yes
     #file-format: JunitXml | CucumberJson
 artifacts:
-  type: zip
   files:
     - processed_template.yaml
   #name: $(date +%Y-%m-%d)
