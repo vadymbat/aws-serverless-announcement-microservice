@@ -76,6 +76,22 @@ Resources:
             Action:
               - "codebuild:StartBuild"
               - "codebuild:BatchGetBuilds"
+              - "codebuild:StopBuild"
+            Resource: "*"
+
+  CodeBuildTestsPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Sub "${StageName}-${ApplicationName}-CodeBuildTest"
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Action:
+              - "codebuild:CreateReportGroup"
+              - "codebuild:CreateReport"
+              - "codebuild:UpdateReport"
+              - "codebuild:BatchPutTestCases"
             Resource: "*"
 
   CustomIamDeployPolicy:
@@ -144,6 +160,7 @@ Resources:
       ManagedPolicyArns:
         - !Ref CodeBuildLogsPolicy
         - !Ref CodePipelineArtifactsS3BucketPolicy
+        - !Ref CodeBuildTestsPolicy
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
