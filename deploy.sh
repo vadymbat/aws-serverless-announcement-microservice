@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # the script expect to get aws-cli configs via Environment variables
 # export AWS_DEFAULT_REGION='eu-central-1'
 # export AWS_ACCESS_KEY_ID=''
@@ -22,4 +24,7 @@ aws cloudformation deploy \
 api_endpoint=$(aws cloudformation describe-stacks --stack-name "${CF_STACK_NAME}" \
     --query "Stacks[].Outputs[? OutputKey == 'ApiUrl'].OutputValue" \
     --output text)
+
+echo "Application deploy is finished!"
+
 echo "The API is available at ${api_endpoint}"
