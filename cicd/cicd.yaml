@@ -204,7 +204,7 @@ Resources:
       ServiceRole: !GetAtt CodeBuildServiceRole.Arn
       Source:
         Type: CODEPIPELINE
-        BuildSpec: cicd/build_buildspec.yml
+        BuildSpec: cicd/codebuild/build_buildspec.yml
       Environment:
         Type: LINUX_CONTAINER
         ComputeType: BUILD_GENERAL1_SMALL
@@ -232,7 +232,7 @@ Resources:
       Source:
         SourceIdentifier: SourceCode
         Type: CODEPIPELINE
-        BuildSpec: cicd/test_buildspec.yml
+        BuildSpec: cicd/codebuild/test_buildspec.yml
       Environment:
         Type: LINUX_CONTAINER
         ComputeType: BUILD_GENERAL1_SMALL
