@@ -24,7 +24,7 @@ export AWS_SESSION_TOKEN=''
 
 3. Clean the Application resources (if deployed)
 ```
-bash cleanup.sh
+bash -e cleanup.sh
 ```
 
 4. Set up GitHub personal token with read access to the repo and export it to the CLI
@@ -34,7 +34,7 @@ export GITHUB_PERSONAL_TOKEN=''
 
 5. Deploy the CICD stack
 ```
-bash cicd/cicd_setup.sh
+bash -e cicd/cicd_setup.sh
 ```
 
 # How to remove the resources
