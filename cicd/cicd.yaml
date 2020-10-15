@@ -1,0 +1,348 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: |
+  An example of serverless application cicd
+Parameters:
+
+  GitHubOAuthToken:
+    Type: String
+    NoEcho: true
+    MinLength: 40
+    MaxLength: 40
+    AllowedPattern: "[a-z0-9]*"
+
+  GitHubOwner:
+    Type: String
+    Default: vadymbat
+    AllowedPattern: "[A-Za-z0-9-]+"
+
+  GitHubRepo:
+    Type: String
+    Default: aws-serverless-announcement-microservice
+    AllowedPattern: "[A-Za-z0-9-]+"
+
+  GitHubBranch:
+    Type: String
+    Default: cicd
+    AllowedPattern: "[A-Za-z0-9-]+"
+
+  ApplicationName:
+    Type: String
+    Default: announcement-app
+    AllowedPattern: "[A-Za-z0-9-]+"
+
+  StageName:
+    Type: String
+    Default: dev
+    Description: The Lambda Function Stage
+
+Resources:
+
+  CodePipelineArtifactsS3BucketPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Sub "${StageName}-${ApplicationName}-CodePipelineArtifactsS3BucketPolicy"
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Action:
+              - "s3:*"
+            Resource:
+              - !Sub "arn:aws:s3:::${CodePipelineArtifactsS3Bucket}/*"
+              - !Sub "arn:aws:s3:::${CodePipelineArtifactsS3Bucket}"
+            
+  CodeBuildLogsPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Sub "${StageName}-${ApplicationName}-CodeBuildLogsPolicy"
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Action:
+              - "logs:CreateLogGroup"
+              - "logs:CreateLogStream"
+              - "logs:PutLogEvents"
+            Resource: "*"
+
+  CodePipelineCodeBuildPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Sub "${StageName}-${ApplicationName}-CodePipelineCodeBuild"
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Action:
+              - "codebuild:StartBuild"
+              - "codebuild:BatchGetBuilds"
+              - "codebuild:StopBuild"
+            Resource: "*"
+
+  CodeBuildTestsPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Sub "${StageName}-${ApplicationName}-CodeBuildTest"
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Action:
+              - "codebuild:CreateReportGroup"
+              - "codebuild:CreateReport"
+              - "codebuild:UpdateReport"
+              - "codebuild:BatchPutTestCases"
+            Resource: "*"
+
+  CustomIamDeployPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Sub "${StageName}-${ApplicationName}-CustomIam"
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Action:
+              - iam:CreateRole
+              - iam:DeleteRole
+              - iam:DeleteRolePolicy
+              - iam:PutRolePolicy
+              - iam:AttachRolePolicy 
+              - iam:DetachRolePolicy 
+            Resource: "*"
+
+  CodePipelineCloudformationPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Sub "${StageName}-${ApplicationName}-CodePipelineCloudformation"
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Action:
+              - "cloudformation:DescribeStacks"
+              - "cloudformation:DescribeChangeSet"
+              - "cloudformation:CreateStack"
+              - "cloudformation:DeleteStack"
+              - "cloudformation:UpdateStack"
+              - "cloudformation:CreateChangeSet"
+              - "cloudformation:DeleteChangeSet"
+              - "cloudformation:ExecuteChangeSet"
+              - "cloudformation:SetStackPolicy"
+              - "cloudformation:ValidateTemplate"
+              - "iam:PassRole"
+            Resource: "*"
+
+  CodePipelineServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${StageName}-${ApplicationName}-CodePipelineRole"
+      ManagedPolicyArns:
+        - !Ref CodeBuildLogsPolicy
+        - !Ref CodePipelineArtifactsS3BucketPolicy
+        - !Ref CodePipelineCodeBuildPolicy
+        - !Ref CodePipelineCloudformationPolicy
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Action:
+              - "sts:AssumeRole"
+            Effect: Allow
+            Principal:
+              Service:
+                - codepipeline.amazonaws.com
+      Path: /
+
+  CodeBuildServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${StageName}-${ApplicationName}-CodeBuild"
+      ManagedPolicyArns:
+        - !Ref CodeBuildLogsPolicy
+        - !Ref CodePipelineArtifactsS3BucketPolicy
+        - !Ref CodeBuildTestsPolicy
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Action:
+              - "sts:AssumeRole"
+            Effect: Allow
+            Principal:
+              Service:
+                - codebuild.amazonaws.com
+      Path: /
+
+  CloudformationRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: cloudformation.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+        - arn:aws:iam::aws:policy/AWSCloudFormationFullAccess
+        - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
+        - arn:aws:iam::aws:policy/AWSLambdaFullAccess
+        - arn:aws:iam::aws:policy/AmazonAPIGatewayAdministrator
+        - !Ref CustomIamDeployPolicy
+
+  CodePipelineArtifactsS3Bucket:
+    Type: AWS::S3::Bucket
+
+  CodeBuildAnnouncementApp:
+    Type: "AWS::CodeBuild::Project"
+    Properties:
+      Name: !Sub ${StageName}-${ApplicationName}-build
+      Description: Generate a temaplate for announcement app build
+      ServiceRole: !GetAtt CodeBuildServiceRole.Arn
+      Source:
+        Type: CODEPIPELINE
+        BuildSpec: cicd/codebuild/build_buildspec.yml
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/amazonlinux2-x86_64-standard:2.0
+        EnvironmentVariables:
+          - Name: CONFIG_S3_BUCKET
+            Type: PLAINTEXT
+            Value: !Ref CodePipelineArtifactsS3Bucket
+      LogsConfig:
+        CloudWatchLogs:
+          Status: ENABLED
+      Artifacts:
+        Type: CODEPIPELINE
+      Tags:
+        - Key: StageName
+          Value: !Ref StageName
+      TimeoutInMinutes: 5
+
+  CodeBuildTestAnnouncementApp:
+    Type: "AWS::CodeBuild::Project"
+    Properties:
+      Name: !Sub ${StageName}-${ApplicationName}-test
+      Description: Test announcement app
+      ServiceRole: !GetAtt CodeBuildServiceRole.Arn
+      Source:
+        SourceIdentifier: SourceCode
+        Type: CODEPIPELINE
+        BuildSpec: cicd/codebuild/test_buildspec.yml
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/amazonlinux2-x86_64-standard:2.0
+      LogsConfig:
+        CloudWatchLogs:
+          Status: ENABLED
+      Artifacts:
+        Type: CODEPIPELINE
+      Tags:
+        - Key: StageName
+          Value: !Ref StageName
+      TimeoutInMinutes: 5
+
+  CodeBuildTestReportGroupAnnouncementApp:
+    Type: AWS::CodeBuild::ReportGroup
+    Properties:
+      Name: !Sub ${CodeBuildTestAnnouncementApp}-JUnitReports
+      Type: TEST
+      DeleteReports: True
+      ExportConfig: 
+        ExportConfigType: NO_EXPORT
+
+  InfraDeploymentPipelineCodePipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      Name: !Sub ${StageName}-${ApplicationName}-cicd-pipeline
+      ArtifactStore:
+        Location: !Ref CodePipelineArtifactsS3Bucket
+        Type: S3
+      RoleArn: !GetAtt CodePipelineServiceRole.Arn
+      Stages:
+        - Name: Source
+          Actions:
+            - Name: Source
+              InputArtifacts: []
+              ActionTypeId:
+                Category: Source
+                Owner: ThirdParty
+                Version: 1
+                Provider: GitHub
+              OutputArtifacts:
+                - Name: SourceCode
+              Configuration:
+                Owner: !Ref GitHubOwner
+                Repo: !Ref GitHubRepo
+                Branch: !Ref GitHubBranch
+                PollForSourceChanges: false
+                OAuthToken: !Ref GitHubOAuthToken
+              RunOrder: 1
+        - Name: Build-cf-templates
+          Actions:
+            - Name: Package-CFTemplates
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Provider: CodeBuild
+                Version: "1"
+              Configuration:
+                ProjectName: !Ref CodeBuildAnnouncementApp
+              InputArtifacts:
+                - Name: SourceCode
+              OutputArtifacts:
+                - Name: BuildArtifact
+              RunOrder: 1
+        - Name: Deploy
+          Actions:
+            - Name: CloudFormation-Deploy
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: "1"
+              InputArtifacts:
+                - Name: BuildArtifact
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                OutputFileName: DeployOutput.json
+                Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
+                RoleArn: !GetAtt CloudformationRole.Arn
+                StackName: !Ref ApplicationName
+                TemplatePath: BuildArtifact::processed_template.yaml
+              OutputArtifacts:
+                - Name: DeployOutput
+              RunOrder: 1
+        - Name: Test
+          Actions:
+            - Name: RunIntegrationTests
+              ActionTypeId:
+                Owner: AWS
+                Category: Test
+                Version: 1
+                Provider: CodeBuild
+              Configuration:
+                ProjectName: !Ref CodeBuildTestAnnouncementApp
+                PrimarySource: SourceCode
+              InputArtifacts:
+                - Name: SourceCode
+                - Name: DeployOutput
+              OutputArtifacts:
+                - Name: TestResults
+              RunOrder: 1
+
+  GithubWebhook:
+    Type: "AWS::CodePipeline::Webhook"
+    Properties:
+      Authentication: GITHUB_HMAC
+      AuthenticationConfiguration:
+        SecretToken: !Ref GitHubOAuthToken
+      RegisterWithThirdParty: "true"
+      Filters:
+        - JsonPath: "$.ref"
+          MatchEquals: refs/heads/{Branch}
+      TargetPipeline: !Ref InfraDeploymentPipelineCodePipeline
+      TargetAction: Source
+      TargetPipelineVersion: !GetAtt InfraDeploymentPipelineCodePipeline.Version

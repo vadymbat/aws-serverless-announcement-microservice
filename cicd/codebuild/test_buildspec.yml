@@ -1,0 +1,32 @@
+version: 0.2
+
+env:
+  shell: bash
+  variables:
+    POSTMAN_COLLECTION_PATH: "postman/aws-serverless-announcement-microservice.postman_collection.json"
+    POSTMAN_ENVIRONMENTS_PATH: "postman/aws-serverless-announcement-microservice.postman_environment.json"
+phases:
+
+  install:
+    runtime-versions:
+      nodejs: 10
+    commands: #https://learning.getpostman.com/docs/postman/collection-runs/command-line-integration-with-newman/
+      - npm install -g newman
+      - yum install -y jq
+
+  pre_build:
+    commands:
+      - export API_GATEWAY_URL=$(jq -r .ApiUrl ${CODEBUILD_SRC_DIR_DeployOutput}/DeployOutput.json)
+      - echo "The apigateway is available at ${API_GATEWAY_URL}"
+      - |
+        jq -e --arg apigwurl "$API_GATEWAY_URL" '(.values[] | select(.key=="api_gateway_url") | .value) = $apigwurl' "${POSTMAN_ENVIRONMENTS_PATH}" > tmp.json \
+          && cp tmp.json "${POSTMAN_ENVIRONMENTS_PATH}" && rm tmp.json
+  build:
+    commands:
+      - echo Build started on `date` from dir `pwd`
+      - newman run "${POSTMAN_COLLECTION_PATH}" --environment "${POSTMAN_ENVIRONMENTS_PATH}" -r junit
+reports:
+  JUnitReports:
+    files: #Store all of the files
+      - '**/*'
+    base-directory: 'newman'

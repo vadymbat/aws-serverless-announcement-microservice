@@ -1,0 +1,18 @@
+version: 0.2
+
+env:
+  shell: bash
+  variables:
+    CONFIG_S3_BUCKET_PATH: "cf_packages"
+phases:
+  build:
+    commands:
+      - |
+        aws cloudformation package \
+          --template-file announcement_app.yaml \
+          --s3-bucket "${CONFIG_S3_BUCKET}" \
+          --s3-prefix "${CONFIG_S3_BUCKET_PATH}" \
+          --output-template-file processed_template.yaml
+artifacts:
+  files:
+    - processed_template.yaml

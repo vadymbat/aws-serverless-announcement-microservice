@@ -95,5 +95,8 @@ Resources:
 
 Outputs:
   ApiUrl:
-    Description: Url
-    Value: !Sub "https://${RestApi}.execute-api.eu-central-1.amazonaws.com/${StageName}/announcement"
+    Description: Api endpoint url
+    Value: !Sub "https://${RestApi}.execute-api.${AWS::Region}.amazonaws.com/${StageName}"
+  ApiId:
+    Description: Rest api id
+    Value: !Sub ${RestApi}
