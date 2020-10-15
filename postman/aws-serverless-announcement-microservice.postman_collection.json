@@ -1,6 +1,6 @@
 {
     "info": {
-        "_postman_id": "aa467ff5-7075-4286-b799-927da0e497a7",
+        "_postman_id": "ffa51cb2-b4af-450a-a4fe-d19f7742d015",
         "name": "aws-serverless-announcement-microservice",
         "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
     },
@@ -11,7 +11,7 @@
                 {
                     "listen": "prerequest",
                     "script": {
-                        "id": "d3c79a62-7b4f-4b6f-94dc-c64657c08933",
+                        "id": "1183e2a4-c7f9-461e-95c9-d22816289b2e",
                         "exec": [
                             ""
                         ],
@@ -21,7 +21,7 @@
                 {
                     "listen": "test",
                     "script": {
-                        "id": "5e8bad4b-8432-455d-bf98-41f9bda8609a",
+                        "id": "d480cbbe-21b7-4f64-a1a8-469fd1072fdd",
                         "exec": [
                             "pm.test(\"Status code is 201\", function () {\r",
                             "//parse the response json and test three properties\r",
@@ -53,17 +53,11 @@
                     }
                 },
                 "url": {
-                    "raw": "https://{{api_gateway_id}}.execute-api.{{aws_region}}.amazonaws.com/dev/announcement",
-                    "protocol": "https",
+                    "raw": "{{api_gateway_url}}/announcement",
                     "host": [
-                        "{{api_gateway_id}}",
-                        "execute-api",
-                        "{{aws_region}}",
-                        "amazonaws",
-                        "com"
+                        "{{api_gateway_url}}"
                     ],
                     "path": [
-                        "dev",
                         "announcement"
                     ]
                 },
@@ -77,7 +71,7 @@
                 {
                     "listen": "test",
                     "script": {
-                        "id": "5bae5da2-d47c-4ffd-abb1-1ce5a2c39d32",
+                        "id": "e3d45c60-0c4b-4f3c-9290-21abfddbe19b",
                         "exec": [
                             "const responseJson = pm.response.json();\r",
                             "announcementUtcDate = new Date(pm.variables.get(\"announcement_date\")+\"Z\").toISOString().split('.')[0];\r",
@@ -103,17 +97,11 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                    "raw": "https://{{api_gateway_id}}.execute-api.{{aws_region}}.amazonaws.com/dev/announcement",
-                    "protocol": "https",
+                    "raw": "{{api_gateway_url}}/announcement",
                     "host": [
-                        "{{api_gateway_id}}",
-                        "execute-api",
-                        "{{aws_region}}",
-                        "amazonaws",
-                        "com"
+                        "{{api_gateway_url}}"
                     ],
                     "path": [
-                        "dev",
                         "announcement"
                     ]
                 },
@@ -126,7 +114,7 @@
         {
             "listen": "prerequest",
             "script": {
-                "id": "e8042a23-c7e1-4546-941a-0915a8fed272",
+                "id": "e8c8887c-84e3-49d7-b0a4-7aa8f8d5cce3",
                 "type": "text/javascript",
                 "exec": [
                     ""
@@ -136,7 +124,7 @@
         {
             "listen": "test",
             "script": {
-                "id": "be509b8a-e78e-4d7e-987f-1e9a4efde827",
+                "id": "5417be7b-63d2-44a6-bf0f-8ace1bead036",
                 "type": "text/javascript",
                 "exec": [
                     ""

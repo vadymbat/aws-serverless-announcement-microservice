@@ -213,16 +213,13 @@ Resources:
       Description: Test announcement app
       ServiceRole: !GetAtt CodeBuildServiceRole.Arn
       Source:
+        SourceIdentifier: SourceCode
         Type: CODEPIPELINE
         BuildSpec: cicd/test_buildspec.yml
       Environment:
         Type: LINUX_CONTAINER
         ComputeType: BUILD_GENERAL1_SMALL
         Image: aws/codebuild/amazonlinux2-x86_64-standard:2.0
-        EnvironmentVariables:
-          - Name: API_GATEWAY_URL
-            Type: PLAINTEXT
-            Value: Fn::GetParam ["DeployOutput", "DeployOutput.json", "ApiUrl"]
       LogsConfig:
         CloudWatchLogs:
           Status: ENABLED
@@ -305,6 +302,7 @@ Resources:
                 Provider: CodeBuild
               Configuration:
                 ProjectName: !Ref CodeBuildTestAnnouncementApp
+                PrimarySource: SourceCode
               InputArtifacts:
                 - Name: SourceCode
                 - Name: DeployOutput

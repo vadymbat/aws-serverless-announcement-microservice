@@ -3,7 +3,8 @@ version: 0.2
 env:
   shell: bash
   variables:
-    CONFIG_S3_BUCKET_PATH: "cf_packages"
+    POSTMAN_COLLECTION_PATH: "postman/aws-serverless-announcement-microservice.postman_collection.json"
+    POSTMAN_ENVIRONMENTS_PATH: "postman/aws-serverless-announcement-microservice.postman_environment.json"
 phases:
 
   install:
@@ -15,18 +16,17 @@ phases:
 
   pre_build:
     commands:
-      - aws s3 cp "s3://${S3_BUCKET}/postman-env-files/PetStoreAPIEnvironment.postman_environment.json" ./02postman/
-      - aws s3 cp "s3://${S3_BUCKET}/postman-env-files/PetStoreAPI.postman_collection.json" ./02postman/
-      - cd ./02postman
-      - ./update-postman-env-file.sh
+      - export API_GATEWAY_URL=$(jq -r .ApiUrl ${CODEBUILD_SRC_DIR_DeployOutput}/DeployOutput.json)
+      - echo "The apigateway is available at ${API_GATEWAY_URL}"
+      - |
+        jq -e --arg apigwurl "$API_GATEWAY_URL" '(.values[] | select(.key=="api_gateway_url") | .value) = $apigwurl' "${POSTMAN_ENVIRONMENTS_PATH}" > tmp.json \
+          && cp tmp.json "${POSTMAN_ENVIRONMENTS_PATH}" && rm tmp.json
   build:
     commands:
-      - |
-        aws cloudformation package \
-          --template-file announcement_app.yaml \
-          --s3-bucket "${CONFIG_S3_BUCKET}" \
-          --s3-prefix "${CONFIG_S3_BUCKET_PATH}" \
-          --output-template-file processed_template.yaml
-artifacts:
-  files:
-    - processed_template.yaml
+      - echo Build started on `date` from dir `pwd`
+      - newman run "${POSTMAN_COLLECTION_PATH}" --environment "${POSTMAN_ENVIRONMENTS_PATH}" -r junit
+reports:
+  JUnitReports:
+    files: #Store all of the files
+      - '**/*'
+    base-directory: 'newman'
