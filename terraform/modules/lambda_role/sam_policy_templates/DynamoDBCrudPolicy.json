@@ -1,0 +1,24 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "dynamodb:GetItem",
+        "dynamodb:DeleteItem",
+        "dynamodb:PutItem",
+        "dynamodb:Scan",
+        "dynamodb:Query",
+        "dynamodb:UpdateItem",
+        "dynamodb:BatchWriteItem",
+        "dynamodb:BatchGetItem",
+        "dynamodb:DescribeTable",
+        "dynamodb:ConditionCheckItem"
+      ],
+      "Resource": [
+        "arn:${aws_partition}:dynamodb:${aws_region}:${aws_account_id}:table/${aws_dynamodb_table_name}",
+        "arn:${aws_partition}:dynamodb:${aws_region}:${aws_account_id}:table/${aws_dynamodb_table_name}/index/*"
+      ]
+    }
+  ]
+}

@@ -131,6 +131,10 @@ dmypy.json
 # Processed CloudFormation templates
 processed_template.yaml
 
+# terraform
+.terraform/
+*.tfplan
+
 # IDE
 .vscode/
 .devcontainer/
