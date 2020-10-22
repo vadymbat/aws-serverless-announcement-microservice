@@ -35,7 +35,7 @@ resource "aws_iam_role_policy" "sam_role_policies" {
   for_each = var.sam_policies
   name     = format("%s%s", each.value, join("_", var.dynamodb_table_names))
   role     = aws_iam_role.lambda_role.id
-  policy   = templatefile(format("${path.module}/sam_policy_templates/%s.json", each.value), local.policy_vars)
+  policy   = templatefile(format("${path.module}/sam_policy_templates/%s.template", each.value), local.policy_vars)
 }
 
 resource "aws_iam_role_policy" "custom_lambda_role" {
