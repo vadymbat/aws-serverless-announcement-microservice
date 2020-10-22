@@ -2,6 +2,11 @@ variable "aws_region" {
   default = "eu-central-1"
 }
 
+variable "common_tags" {
+    type = map(string)
+    default = {}
+}
+
 ### Lambda configuration start ###
 variable "lambda_name" {
   type = string

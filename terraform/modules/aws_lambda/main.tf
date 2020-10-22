@@ -26,4 +26,6 @@ resource "aws_lambda_function" "lambda_function" {
   environment {
     variables = var.lambda_env_variables
   }
+
+  tags = var.common_tags
 }
