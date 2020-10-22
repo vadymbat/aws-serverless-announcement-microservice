@@ -3,7 +3,7 @@ locals {
     lambda_integration_uri_create_announcement = module.aws_lambda_create_announcement.function_api_integration_uri,
     lambda_integration_uri_list_announcements  = module.aws_lambda_list_announcements.function_api_integration_uri
   }
-  common_tags = merge(var.intial_tags, { "Owner" = var.application_name})
+  common_tags = merge(var.intial_tags, { "Owner" = var.application_name })
 }
 terraform {
   required_version = ">=0.12.29"
@@ -25,8 +25,8 @@ module "aws_lambda_create_announcement" {
 
   # lambda configuration
   lambda_name             = format("%s-create-announcement", var.application_name)
-  lambda_artifacts_bucket = "announcement-app-aritfacts"
-  lambda_artifacts_key    = "announcement-app.zip"
+  lambda_artifacts_bucket = var.lambda_artifact_s3_bucket
+  lambda_artifacts_key    = var.lambda_artifact_name
   lambda_runtime          = "python3.7"
   lambda_handler          = "handler.create_announcement"
   lambda_env_variables = {
@@ -47,8 +47,8 @@ module "aws_lambda_list_announcements" {
 
   # lambda configuration
   lambda_name             = format("%s-list-announcements", var.application_name)
-  lambda_artifacts_bucket = "announcement-app-aritfacts"
-  lambda_artifacts_key    = "announcement-app.zip"
+  lambda_artifacts_bucket = var.lambda_artifact_s3_bucket
+  lambda_artifacts_key    = var.lambda_artifact_name
   lambda_runtime          = "python3.7"
   lambda_handler          = "handler.list_announcements"
   lambda_env_variables = {

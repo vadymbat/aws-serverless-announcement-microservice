@@ -14,6 +14,18 @@ variable "rest_api_stage" {
   default     = "dev"
 }
 
+variable "lambda_artifact_s3_bucket" {
+  type        = string
+  description = "The s3 bucket where"
+  default     = "aws-serverless-announcement-microservice"
+}
+
+variable "lambda_artifact_name" {
+  type        = string
+  description = "The s3 bucket where"
+  default     = "announcement-app.zip"
+}
+
 variable "lambda_log_level" {
   type    = string
   default = "DEBUG"
