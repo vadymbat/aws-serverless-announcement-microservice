@@ -18,3 +18,8 @@ variable "lambda_log_level" {
     type = string
     default = "DEBUG"
 }
+
+variable "dynamodb_announcements_table_name" {
+    type = string
+    default = "AnnouncementsTable"
+}

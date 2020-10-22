@@ -1,12 +1,12 @@
 openapi: "3.0.0"
 info:
   version: 1.0.0
-  title: Swagger announcement
+  title: announcement-app-api
 paths:
   /announcement:
     get:
-      summary: List tasks
-      description: Returns list of tasks
+      summary: List announcements
+      description: Returns list of announcements
       responses:
         '200':
           description: announcements response
@@ -17,7 +17,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/Announcement'
       x-amazon-apigateway-integration:
-        uri: Fn::Sub: arn:aws:apigateway:${var.aws_region}:lambda:path/2015-03-31/functions/${ListAnnouncementsFunction.Arn}/invocations
+        uri: ${lambda_integration_uri_list_announcements}
         responses:
           default:
             statusCode: "200"
@@ -55,7 +55,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
       x-amazon-apigateway-integration:
-        uri: Fn::Sub: arn:aws:apigateway:${var.aws_region}:lambda:path/2015-03-31/functions/${CreateAnnouncementFunction.Arn}/invocations
+        uri: ${lambda_integration_uri_create_announcement}
         responses:
           default:
             statusCode: "201"
