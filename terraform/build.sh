@@ -20,11 +20,7 @@ pip3 install -r ${SOURCE_DIR_PATH}/requirements.txt --target ${PACKAGE_DIR_PATH}
 
 aws s3 mb s3://${CONFIG_S3_BUCKET}
 
-cd ${PACKAGE_DIR_PATH}
-
-zip -r9 ../${ARTIFACT_NAME} . -x *.pyc 
-
-cd ..
+cd ${PACKAGE_DIR_PATH} && zip -r9 ../${ARTIFACT_NAME} . -x *.pyc && cd ..
 
 aws s3 cp ${ARTIFACT_NAME} s3://${CONFIG_S3_BUCKET}/
 
