@@ -140,5 +140,6 @@ processed_template.yaml
 *.tfstate.backup
 
 # IDE
+.DS_Store
 .vscode/
 .devcontainer/
