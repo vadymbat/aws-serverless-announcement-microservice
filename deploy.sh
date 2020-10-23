@@ -7,7 +7,7 @@
 # export AWS_SESSION_TOKEN='''
 
 CONFIG_S3_BUCKET='aws-serverless-announcement-microservice'
-CF_STACK_NAME='announcment-app'
+CF_STACK_NAME='announcement-app'
 
 aws s3 mb s3://${CONFIG_S3_BUCKET}
 

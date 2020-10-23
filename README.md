@@ -10,7 +10,9 @@ The application consists of:
 * AWS account
 * aws-cli installed on your host and configured
 
-# How to deploy
+The instruction below is for Unix based systems
+
+# How to deploy using cloudformation
 1. Clone the repo
 ```
 git clone https://github.com/vadymbat/aws-serverless-announcement-microservice.git \
@@ -30,7 +32,7 @@ export AWS_SESSION_TOKEN=''
 bash -e deploy.sh
 ```
 
-# How to remove the resources
+# How to remove the resources after cloudformation
 1. Configure access to AWS
 ```
 export AWS_DEFAULT_REGION='eu-central-1'
@@ -40,6 +42,50 @@ export AWS_SESSION_TOKEN=''
 ```
 
 2. Run cleanup script
+```
+bash -e cleanup.sh
+```
+
+# How to deploy using terraform
+1. Clone the repo
+```
+git clone https://github.com/vadymbat/aws-serverless-announcement-microservice.git \
+    && cd aws-serverless-announcement-microservice/terraform
+```
+
+2. Configure access to AWS
+```
+export AWS_DEFAULT_REGION='eu-central-1'
+export AWS_ACCESS_KEY_ID=''
+export AWS_SECRET_ACCESS_KEY=''
+export AWS_SESSION_TOKEN=''
+```
+
+3. Build the application
+```
+bash -e build.sh
+```
+
+4. Deploy with terraform
+```
+terraform apply
+```
+
+# How to remove the resources after terraform
+1. Configure access to AWS
+```
+export AWS_DEFAULT_REGION='eu-central-1'
+export AWS_ACCESS_KEY_ID=''
+export AWS_SECRET_ACCESS_KEY=''
+export AWS_SESSION_TOKEN=''
+```
+
+2. Remove application resources with terraform
+```
+terraform destroy
+```
+
+3. Run cleanup script
 ```
 bash -e cleanup.sh
 ```
